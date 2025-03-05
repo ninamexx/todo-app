@@ -1,7 +1,7 @@
 "use client";
 import { Todo } from "@/../../types";
 import React, { useState } from "react";
-import { TaskList } from "./TaskList";
+import TaskList from "./TaskList";
 import { v4 as uuidv4 } from "uuid";
 
 export const TaskListClient = () => {
@@ -26,6 +26,14 @@ export const TaskListClient = () => {
     setTasks(tasks.filter((task) => task.id !== id));
   };
 
+  const toggleComplete = (id: string) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex gap-2">
@@ -43,7 +51,11 @@ export const TaskListClient = () => {
           Add
         </button>
       </div>
-      <TaskList tasks={tasks} onDelete={deleteTask} />
+      <TaskList
+        tasks={tasks}
+        onDelete={deleteTask}
+        toggleComplete={toggleComplete}
+      />
     </div>
   );
 };
