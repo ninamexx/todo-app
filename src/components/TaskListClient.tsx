@@ -9,14 +9,17 @@ export const TaskListClient = () => {
     { id: uuidv4(), title: "Learn React", completed: false },
     { id: uuidv4(), title: "Build To-Do App", completed: false },
   ]);
+  const [taskName, setTaskName] = useState("");
 
-  const addTask = (title: string) => {
+  const addTask = () => {
+    if (!taskName.trim()) return;
     const newTask: Todo = {
       id: uuidv4(),
-      title,
+      title: taskName,
       completed: false,
     };
     setTasks([...tasks, newTask]);
+    setTaskName("");
   };
 
   const deleteTask = (id: string) => {
@@ -24,14 +27,22 @@ export const TaskListClient = () => {
   };
 
   return (
-    <div>
-      <h2 className="text-2xl">To-Do List</h2>
-      <button
-        onClick={() => addTask("New Task")}
-        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        Add Task
-      </button>
+    <div className="space-y-4">
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={taskName}
+          onChange={(e) => setTaskName(e.target.value)}
+          placeholder="Enter task..."
+          className="border p-2 rounded w-full"
+        />
+        <button
+          onClick={addTask}
+          className="bg-blue-500 text-white p-2 rounded"
+        >
+          Add
+        </button>
+      </div>
       <TaskList tasks={tasks} onDelete={deleteTask} />
     </div>
   );
