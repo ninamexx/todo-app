@@ -2,6 +2,7 @@
 import { Todo } from "@/../../types";
 import React, { useState } from "react";
 import TaskList from "./TaskList";
+import { TaskForm } from "./TaskForm";
 import { v4 as uuidv4 } from "uuid";
 
 export const TaskListClient = () => {
@@ -21,24 +22,19 @@ export const TaskListClient = () => {
       dueDate: "2025-12-31",
     },
   ]);
-  const [taskName, setTaskName] = useState("");
-  const [taskDescription, setTaskDescription] = useState("");
-  const [taskDueDate, setTaskDueDate] = useState("");
+  const [isTaskFormVisible, setIsTaskFormVisible] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<Todo | null>(null);
 
-  const addTask = () => {
-    if (!taskName.trim() || !taskDescription.trim() || !taskDueDate.trim())
-      return;
-    const newTask: Todo = {
-      id: uuidv4(),
-      title: taskName,
-      description: taskDescription,
-      dueDate: taskDueDate,
-      completed: false,
-    };
+  const addTask = (newTask: Todo) => {
     setTasks([...tasks, newTask]);
-    setTaskName("");
-    setTaskDescription("");
-    setTaskDueDate("");
+  };
+
+  const editTask = (updatedTask: Todo) => {
+    setTasks(
+      tasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
+    );
+    setTaskToEdit(null);
+    setIsTaskFormVisible(false);
   };
 
   const deleteTask = (id: string) => {
@@ -51,46 +47,44 @@ export const TaskListClient = () => {
         task.id === id ? { ...task, completed: !task.completed } : task
       )
     );
-    const task = tasks.find((task) => task.id === id); //For debugging
+    const task = tasks.find((task) => task.id === id); // For debugging
     if (task) {
       console.log(task.id, "task is completed?", !task.completed);
     }
   };
 
+  const handleEdit = (task: Todo) => {
+    setTaskToEdit(task);
+    setIsTaskFormVisible(true);
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-2">
-        <input
-          type="text"
-          value={taskName}
-          onChange={(e) => setTaskName(e.target.value)}
-          placeholder="Enter task title..."
-          className="border p-2 rounded w-full"
+      <button
+        onClick={() => {
+          setIsTaskFormVisible(true);
+          setTaskToEdit(null);
+        }}
+        className="bg-blue-500 text-white p-2 rounded"
+      >
+        Add Task
+      </button>
+      {isTaskFormVisible && (
+        <TaskForm
+          onAddTask={taskToEdit ? editTask : addTask}
+          onClose={() => {
+            setIsTaskFormVisible(false);
+            setTaskToEdit(null);
+          }}
+          task={taskToEdit}
+          onDelete={deleteTask}
         />
-        <input
-          type="text"
-          value={taskDescription}
-          onChange={(e) => setTaskDescription(e.target.value)}
-          placeholder="Enter task description..."
-          className="border p-2 rounded w-full"
-        />
-        <input
-          type="date"
-          value={taskDueDate}
-          onChange={(e) => setTaskDueDate(e.target.value)}
-          className="border p-2 rounded w-full"
-        />
-        <button
-          onClick={addTask}
-          className="bg-blue-500 text-white p-2 rounded"
-        >
-          Add Task
-        </button>
-      </div>
+      )}
       <TaskList
         tasks={tasks}
         onDelete={deleteTask}
         toggleComplete={toggleComplete}
+        onEdit={handleEdit}
       />
     </div>
   );

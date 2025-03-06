@@ -5,12 +5,13 @@ type TaskListProps = {
   tasks: Todo[];
   toggleComplete: (id: string) => void;
   onDelete: (id: string) => void;
+  onEdit: (task: Todo) => void;
 };
 
 export default function TaskList({
   tasks,
   toggleComplete,
-  onDelete,
+  onEdit,
 }: TaskListProps) {
   return (
     <div className="space-y-2">
@@ -19,7 +20,7 @@ export default function TaskList({
           key={task.id}
           task={task}
           toggleComplete={toggleComplete}
-          onDelete={onDelete}
+          onEdit={onEdit}
         />
       ))}
     </div>

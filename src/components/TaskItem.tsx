@@ -4,10 +4,10 @@ import { Todo } from "types";
 type TaskItemProps = {
   task: Todo;
   toggleComplete: (id: string) => void;
-  onDelete: (id: string) => void;
+  onEdit: (task: Todo) => void;
 };
 
-export const TaskItem = ({ task, toggleComplete, onDelete }: TaskItemProps) => {
+export const TaskItem = ({ task, toggleComplete, onEdit }: TaskItemProps) => {
   return (
     <div className="flex justify-between items-center p-2 border rounded">
       <div
@@ -16,11 +16,15 @@ export const TaskItem = ({ task, toggleComplete, onDelete }: TaskItemProps) => {
         }`}
         onClick={() => toggleComplete(task.id)}
       >
-        {task.title}
+        {task.title && <h2 className="text-lg">{task.title}</h2>}
+        {task.description && <p className="text-sm">{task.description}</p>}
+        {task.dueDate && <p className="text-sm">Due: {task.dueDate}</p>}
       </div>
-      <Button onClick={() => onDelete(task.id)} className="text-red-500">
-        ❌
-      </Button>
+      <div className="space-x-2">
+        <Button onClick={() => onEdit(task)} className="text-blue-500">
+          ✏️
+        </Button>
+      </div>
     </div>
   );
 };
