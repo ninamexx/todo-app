@@ -4,7 +4,6 @@ import { Todo } from "@/../../types";
 type TaskListProps = {
   tasks: Todo[];
   toggleComplete: (id: string) => void;
-  onDelete: (id: string) => void;
   onEdit: (task: Todo) => void;
 };
 
