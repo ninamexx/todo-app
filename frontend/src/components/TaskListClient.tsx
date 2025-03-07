@@ -1,59 +1,14 @@
 "use client";
 import { Todo } from "@/../../types";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TaskList from "./TaskList";
 import { TaskForm } from "./TaskForm";
-import { v4 as uuidv4 } from "uuid";
 import { Pagination } from "@/components/Pagination";
 import { Button } from "./ui/button";
+import axios from "axios";
 
 export const TaskListClient = () => {
-  const [tasks, setTasks] = useState<Todo[]>([
-    {
-      id: uuidv4(),
-      title: "Learn React",
-      completed: false,
-      description: "Learn it",
-      dueDate: "2025-12-31",
-    },
-    {
-      id: uuidv4(),
-      title: "Build To-Do App",
-      completed: false,
-      description: "Dew it",
-      dueDate: "2025-12-31",
-    },
-    {
-      id: uuidv4(),
-      title: "Profit",
-      completed: false,
-      description: "Prophet",
-      dueDate: "2025-12-31",
-    },
-    {
-      id: uuidv4(),
-      title: "Repeat",
-      completed: false,
-      description: "Reheat",
-      dueDate: "2025-12-31",
-    },
-    {
-      id: uuidv4(),
-      title: "Repeat",
-      completed: false,
-      description: "Reheat",
-      dueDate: "2025-12-31",
-    },
-    {
-      id: uuidv4(),
-      title: "Repeat",
-      completed: false,
-      description: "Reheat",
-      dueDate: "2025-12-31",
-    },
-
-    // Add more tasks as needed
-  ]);
+  const [tasks, setTasks] = useState<Todo[]>([]);
   const [isTaskFormVisible, setIsTaskFormVisible] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Todo | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -61,32 +16,79 @@ export const TaskListClient = () => {
   const [sortCriteria, setSortCriteria] = useState<"title" | "dueDate">(
     "title"
   );
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const addTask = (newTask: Todo) => {
-    setTasks([...tasks, newTask]);
+  useEffect(() => {
+    // Fetch tasks from the API when the component mounts
+    const fetchTasks = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/tasks", {
+          params: {
+            page: currentPage,
+            limit: tasksPerPage,
+            sort: sortCriteria,
+            search: searchQuery,
+          },
+        });
+        setTasks(response.data.tasks);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
+    };
+
+    fetchTasks();
+  }, [currentPage, tasksPerPage, sortCriteria, searchQuery]);
+
+  const addTask = async (newTask: Todo) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/tasks",
+        newTask
+      );
+      setTasks([...tasks, response.data]);
+    } catch (error) {
+      console.error("Error adding task:", error);
+    }
   };
 
-  const editTask = (updatedTask: Todo) => {
-    setTasks(
-      tasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
-    );
-    setTaskToEdit(null);
-    setIsTaskFormVisible(false);
+  const editTask = async (updatedTask: Todo) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/tasks/${updatedTask.id}`,
+        updatedTask
+      );
+      setTasks(
+        tasks.map((task) => (task.id === updatedTask.id ? response.data : task))
+      );
+      setTaskToEdit(null);
+      setIsTaskFormVisible(false);
+    } catch (error) {
+      console.error("Error editing task:", error);
+    }
   };
 
-  const deleteTask = (id: string) => {
-    setTasks(tasks.filter((task) => task.id !== id));
+  const deleteTask = async (id: string) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/tasks/${id}`);
+      setTasks(tasks.filter((task) => task.id !== id));
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
   };
 
-  const toggleComplete = (id: string) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task
-      )
-    );
-    const task = tasks.find((task) => task.id === id); // For debugging
+  const toggleComplete = async (id: string) => {
+    const task = tasks.find((task) => task.id === id);
     if (task) {
-      console.log(task.id, "task is completed?", !task.completed);
+      const updatedTask = { ...task, completed: !task.completed };
+      try {
+        const response = await axios.put(
+          `http://localhost:5000/api/tasks/${id}`,
+          updatedTask
+        );
+        setTasks(tasks.map((task) => (task.id === id ? response.data : task)));
+      } catch (error) {
+        console.error("Error toggling task completion:", error);
+      }
     }
   };
 
@@ -149,6 +151,15 @@ export const TaskListClient = () => {
             <option value="title">Title</option>
             <option value="dueDate">Due Date</option>
           </select>
+        </div>
+        <div>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border p-2 rounded"
+          />
         </div>
       </div>
       <TaskList

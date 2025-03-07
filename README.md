@@ -36,12 +36,15 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 #Features
-- 
+
+-
 
 #Workway
+
 1. Frontend
-	- Import and create sutiable components based on ShadcnUI
-	- Styling with Tailwind
-	- REST API
+   - Import and create sutiable components based on ShadcnUI
+   - Styling with Tailwind
+   - REST API
+     -Zod
 2. Backend
 3. Testing
