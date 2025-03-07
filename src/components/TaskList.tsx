@@ -1,16 +1,27 @@
 import { TaskItem } from "./TaskItem";
+import { Todo } from "@/../../types";
 
 type TaskListProps = {
-  tasks: string[];
-  onDelete: (index: number) => void;
+  tasks: Todo[];
+  toggleComplete: (id: string) => void;
+  onEdit: (task: Todo) => void;
 };
 
-export const TaskList = ({ tasks, onDelete }: TaskListProps) => {
+export default function TaskList({
+  tasks,
+  toggleComplete,
+  onEdit,
+}: TaskListProps) {
   return (
-    <div>
-      {tasks.map((task, index) => (
-        <TaskItem key={index} task={task} onDelete={() => onDelete(index)} />
+    <div className="space-y-2">
+      {tasks.map((task) => (
+        <TaskItem
+          key={task.id}
+          task={task}
+          toggleComplete={toggleComplete}
+          onEdit={onEdit}
+        />
       ))}
     </div>
   );
-};
+}
