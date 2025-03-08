@@ -1,6 +1,6 @@
 "use client";
 import { Todo } from "@/../../types";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import TaskList from "./TaskList";
 import { TaskForm } from "./TaskForm";
 import { Pagination } from "@/components/Pagination";
@@ -120,7 +120,7 @@ export const TaskListClient = () => {
           setIsTaskFormVisible(true);
           setTaskToEdit(null);
         }}
-        className="bg-blue-500 text-white p-2 rounded"
+        className=""
       >
         + New Task
       </Button>

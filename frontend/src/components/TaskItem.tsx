@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Todo } from "types";
+import { Todo } from "../../../types"; //Fix this path
 
 type TaskItemProps = {
   task: Todo;
