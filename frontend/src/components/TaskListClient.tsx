@@ -5,6 +5,7 @@ import { TaskForm } from "./TaskForm";
 import { Pagination } from "@/components/Pagination";
 import { Button } from "./ui/button";
 import axios from "axios";
+import { addPredefinedTasks } from "../predefinedTasks";
 
 export const TaskListClient = () => {
   const [tasks, setTasks] = useState<Todo[]>([]);
@@ -46,7 +47,7 @@ export const TaskListClient = () => {
         "http://localhost:5000/api/tasks",
         newTask
       );
-      setTasks([...tasks, response.data]);
+      setTasks((prevTasks) => [...prevTasks, response.data]);
     } catch (error) {
       console.error("Error adding task:", error);
     }
@@ -58,8 +59,10 @@ export const TaskListClient = () => {
         `http://localhost:5000/api/tasks/${updatedTask.id}`,
         updatedTask
       );
-      setTasks(
-        tasks.map((task) => (task.id === updatedTask.id ? response.data : task))
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === updatedTask.id ? response.data : task
+        )
       );
       setTaskToEdit(null);
       setIsTaskFormVisible(false);
@@ -71,19 +74,18 @@ export const TaskListClient = () => {
   const deleteTask = async (id: string) => {
     try {
       await axios.delete(`http://localhost:5000/api/tasks/${id}`);
-      const updatedTasks = tasks.filter((task) => task.id !== id);
-      setTasks(updatedTasks);
+      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
 
       // Check if the current page is empty and adjust the page number
       if (activeTab === "uncompleted") {
-        const uncompletedTasks = updatedTasks.filter((task) => !task.completed);
+        const uncompletedTasks = tasks.filter((task) => !task.completed);
         const totalPages =
           Math.ceil(uncompletedTasks.length / tasksPerPage) || 1;
         if (currentPage > totalPages) {
           setCurrentPage(totalPages);
         }
       } else {
-        const completedTasks = updatedTasks.filter((task) => task.completed);
+        const completedTasks = tasks.filter((task) => task.completed);
         const totalPages = Math.ceil(completedTasks.length / tasksPerPage) || 1;
         if (completedPage > totalPages) {
           setCompletedPage(totalPages);
@@ -108,23 +110,20 @@ export const TaskListClient = () => {
           `http://localhost:5000/api/tasks/${id}`,
           updatedTask
         );
-        const updatedTasks = tasks.map((task) =>
-          task.id === id ? response.data : task
+        setTasks((prevTasks) =>
+          prevTasks.map((task) => (task.id === id ? response.data : task))
         );
-        setTasks(updatedTasks);
 
         // Check if the current page is empty and adjust the page number
         if (activeTab === "uncompleted") {
-          const uncompletedTasks = updatedTasks.filter(
-            (task) => !task.completed
-          );
+          const uncompletedTasks = tasks.filter((task) => !task.completed);
           const totalPages =
             Math.ceil(uncompletedTasks.length / tasksPerPage) || 1;
           if (currentPage > totalPages) {
             setCurrentPage(totalPages);
           }
         } else {
-          const completedTasks = updatedTasks.filter((task) => task.completed);
+          const completedTasks = tasks.filter((task) => task.completed);
           const totalPages =
             Math.ceil(completedTasks.length / tasksPerPage) || 1;
           if (completedPage > totalPages) {
@@ -140,6 +139,24 @@ export const TaskListClient = () => {
   const handleEdit = (task: Todo) => {
     setTaskToEdit(task);
     setIsTaskFormVisible(true);
+  };
+
+  const deleteAllTasks = async () => {
+    try {
+      // Fetch all tasks from the backend
+      const response = await axios.get("http://localhost:5000/api/tasks");
+      const allTasks: Todo[] = response.data.tasks;
+
+      // Delete all tasks from the backend
+      for (const task of allTasks) {
+        await axios.delete(`http://localhost:5000/api/tasks/${task.id}`);
+      }
+
+      // Clear existing tasks from the frontend state
+      setTasks([]);
+    } catch (error) {
+      console.error("Error deleting all tasks:", error);
+    }
   };
 
   // Sorting logic
@@ -176,6 +193,11 @@ export const TaskListClient = () => {
   const paginateCompleted = (pageNumber: number) =>
     setCompletedPage(pageNumber);
 
+  const handleAddPredefinedTasks = async () => {
+    await deleteAllTasks();
+    await addPredefinedTasks(setTasks, addTask);
+  };
+
   return (
     <div className="space-y-4 w-4/7 mx-auto">
       <Button
@@ -186,6 +208,12 @@ export const TaskListClient = () => {
         className=""
       >
         + New Task
+      </Button>
+      <Button onClick={handleAddPredefinedTasks} className="">
+        + Add Predefined Tasks
+      </Button>
+      <Button onClick={deleteAllTasks} className="">
+        Delete All Tasks
       </Button>
       {isTaskFormVisible && (
         <TaskForm
@@ -207,12 +235,12 @@ export const TaskListClient = () => {
             id="sort"
             value={sortCriteria}
             onChange={(e) =>
-              setSortCriteria(e.target.value as "title" | "dueDate")
+              setSortCriteria(e.target.value as "dueDate" | "title")
             }
             className="border p-2 rounded"
           >
-            <option value="dueDate">Due Date</option>
-            <option value="title">Title</option>
+            <option value="title">Due Ddate</option>
+            <option value="dueDate">Title</option>
           </select>
         </div>
         <div>
@@ -246,7 +274,7 @@ export const TaskListClient = () => {
       {activeTab === "uncompleted" ? (
         <>
           {currentUncompletedTasks.length === 0 ? (
-            <p>No uncompleted tasks</p>
+            <p>No uncompleted tasks, yippie!</p>
           ) : (
             <>
               <TaskList

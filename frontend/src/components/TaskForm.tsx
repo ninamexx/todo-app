@@ -91,12 +91,12 @@ export const TaskForm = ({
     }
 
     const newTask: Todo = {
-      id: task?.id || uuidv4(),
+      id: uuidv4(),
       title: taskName.trim(),
       description: taskDescription.trim(),
       dueDate: taskDueDate.trim(),
       priority: taskPriority as "Low" | "Medium" | "High",
-      completed: task?.completed || false,
+      completed: false,
     };
     onAddTask(newTask);
     setTaskName("");
