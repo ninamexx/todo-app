@@ -10,6 +10,7 @@ This is a full-stack Todo application built with a React frontend and an Express
 - [Backend](#backend)
 - [Features](#features)
 - [Workway](#workway)
+- [API Documentation](#api-documentation)
 - [Learn More](#learn-more)
 
 ## Getting Started
@@ -36,7 +37,7 @@ npm install
 npm run dev
 ```
 
-The frontend application will be running on [http://localhost:3000](http://localhost:3000).
+The frontend application will be running on [http://localhost:5137](http://localhost:5137).
 
 ## Folder Structure
 
@@ -103,6 +104,10 @@ The backend is built using Express and provides RESTful API endpoints for managi
    - Data storage in-memory (can be extended to use a database)
 3. **Testing**
    - Unit and integration tests (would've been good to implement)
+
+## API Documentation
+
+For detailed API documentation, please refer to the [SwaggerHub API Documentation](https://app.swaggerhub.com/apis-docs/abby-b8a-860/todo-app_api/1.0.0).
 
 ## Learn More
 
