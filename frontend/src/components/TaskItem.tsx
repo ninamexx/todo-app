@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Todo } from "../../../types"; //Fix this path
+import { calculateDaysUntilDue } from "@/utils/utils";
 
 type TaskItemProps = {
   task: Todo;
@@ -18,8 +19,9 @@ export const TaskItem = ({ task, toggleComplete, onEdit }: TaskItemProps) => {
       >
         {task.title && <h2 className="text-lg">{task.title}</h2>}
         {task.description && <p className="text-sm">{task.description}</p>}
-        {task.dueDate && <p className="text-sm">Due: {task.dueDate}</p>}
-        {task.priority && <p className="text-sm">Priority: {task.priority}</p>}
+        {task.dueDate && (
+          <p className="text-sm">Due {calculateDaysUntilDue(task.dueDate)}</p>
+        )}
       </div>
 
       <div className="space-x-2">
