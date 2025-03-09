@@ -28,6 +28,7 @@ export const TaskForm = ({
     task?.description || ""
   );
   const [taskDueDate, setTaskDueDate] = useState(task?.dueDate || "");
+  const [taskPriority, setTaskPriority] = useState(task?.priority || "low");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [dueDateWarning, setDueDateWarning] = useState("");
 
@@ -36,6 +37,7 @@ export const TaskForm = ({
       setTaskName(task.title);
       setTaskDescription(task.description);
       setTaskDueDate(task.dueDate);
+      setTaskPriority(task.priority);
     }
   }, [task]);
 
@@ -93,12 +95,14 @@ export const TaskForm = ({
       title: taskName.trim(),
       description: taskDescription.trim(),
       dueDate: taskDueDate.trim(),
+      priority: taskPriority,
       completed: task?.completed || false,
     };
     onAddTask(newTask);
     setTaskName("");
     setTaskDescription("");
     setTaskDueDate("");
+    setTaskPriority("low");
     onClose();
   };
 
@@ -142,6 +146,13 @@ export const TaskForm = ({
         ) : (
           errors.dueDate && <p className="text-red-500">{errors.dueDate}</p>
         )}
+        <input
+          type="text"
+          value={taskPriority}
+          onChange={(e) => setTaskPriority(e.target.value)}
+          placeholder="Enter task priority..."
+          className="border p-2 rounded w-full mb-1"
+        />
         <div className="flex justify-between items-center">
           {task && (
             <Button

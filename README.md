@@ -1,50 +1,117 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Todo App
+
+This is a full-stack Todo application built with a React frontend and an Express backend. The project is designed to help users manage their tasks efficiently with features like task creation, editing, deletion, and prioritization.
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Folder Structure](#folder-structure)
+- [Frontend](#frontend)
+- [Backend](#backend)
+- [Features](#features)
+- [Workway](#workway)
+- [Learn More](#learn-more)
 
 ## Getting Started
 
-First, run the development server:
+### Backend Setup
+
+To run the backend server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd backend
+npm install
+node server.js
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The backend server will be running on [http://localhost:5000](http://localhost:5000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Frontend Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+To run the frontend application:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The frontend application will be running on [http://localhost:3000](http://localhost:3000).
+
+## Folder Structure
+
+```
+todo-app/
+├── backend/                # Backend server code
+│   ├── server.js           # Express server setup
+│   └── package.json        # Backend dependencies
+├── frontend/               # Frontend application code
+│   ├── src/                # Source files
+│   │   ├── components/     # React components
+│   │   ├── lib/            # Utility functions
+│   │   ├── App.tsx         # Main App component
+│   │   ├── main.tsx        # Entry point
+│   │   └── index.css       # Global styles
+│   ├── public/             # Public assets
+│   ├── package.json        # Frontend dependencies
+│   ├── tsconfig.json       # TypeScript configuration
+│   └── vite.config.ts      # Vite configuration
+├── types.ts                # Shared TypeScript types
+└── README.md               # Project documentation
+```
+
+## Frontend
+
+The frontend is built using React, TypeScript, and Vite. It uses Tailwind CSS for styling and ShadcnUI for UI components. The frontend communicates with the backend via REST API calls using Axios.
+
+### Key Dependencies
+
+- **React**: A JavaScript library for building user interfaces.
+- **TypeScript**: A typed superset of JavaScript that compiles to plain JavaScript.
+- **Vite**: A fast build tool for modern web projects.
+- **Tailwind CSS**: A utility-first CSS framework for rapid UI development.
+- **ShadcnUI**: A UI component library.
+- **Axios**: A promise-based HTTP client for making API requests.
+
+## Backend
+
+The backend is built using Express and provides RESTful API endpoints for managing tasks. It uses UUID for generating unique task IDs and CORS for handling cross-origin requests.
+
+### Key Dependencies
+
+- **Express**: A minimal and flexible Node.js web application framework.
+- **UUID**: A library for generating unique identifiers.
+- **CORS**: A middleware for enabling Cross-Origin Resource Sharing.
+- **Body-Parser**: A middleware for parsing incoming request bodies.
+
+## Features
+
+- Task creation, editing, and deletion
+- Task prioritization (low, medium, high)
+- Task completion toggling
+- Pagination, sorting, and searching of tasks
+
+## Workway
+
+1. **Frontend**
+   - Import and create suitable components based on ShadcnUI
+   - Styling with Tailwind
+   - REST API integration using Axios
+   - Form validation using Zod
+2. **Backend**
+   - RESTful API endpoints for task management
+   - Data storage in-memory (can be extended to use a database)
+3. **Testing**
+   - Unit and integration tests (would've been good to implement)
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+To learn more about the frameworks and libraries used in this project, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-#Features
-
--
-
-#Workway
-
-1. Frontend
-   - Import and create sutiable components based on ShadcnUI
-   - Styling with Tailwind
-   - REST API
-     -Zod
-2. Backend
-3. Testing
+- [React Documentation](https://reactjs.org/docs/getting-started.html)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+- [Vite Documentation](https://vitejs.dev/guide/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [ShadcnUI Documentation](https://shadcn.dev/docs)
+- [Express Documentation](https://expressjs.com/en/starter/installing.html)
+- [Axios Documentation](https://axios-http.com/docs/intro)

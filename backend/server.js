@@ -16,6 +16,7 @@ let tasks = [
     description: "Learn it",
     dueDate: "2025-12-31",
     completed: false,
+    priority: 'medium',
   },
   {
     id: uuidv4(),
@@ -23,6 +24,7 @@ let tasks = [
     description: "Dew it",
     dueDate: "2025-12-31",
     completed: false,
+    priority: 'high',
   },
   // Add more tasks as needed
 ];
@@ -56,7 +58,7 @@ app.get('/api/tasks', (req, res) => {
   });
 });
 
-// Get a single task by ID
+// Get a single task by ID (not used in the frontend)
 app.get('/api/tasks/:id', (req, res) => {
   const task = tasks.find(t => t.id === req.params.id);
   if (task) {
@@ -68,7 +70,7 @@ app.get('/api/tasks/:id', (req, res) => {
 
 // Create a new task
 app.post('/api/tasks', (req, res) => {
-  const newTask = { id: uuidv4(), ...req.body };
+  const newTask = { id: uuidv4(), priority: 'low', ...req.body };
   tasks.push(newTask);
   res.status(201).json(newTask);
 });
@@ -77,7 +79,7 @@ app.post('/api/tasks', (req, res) => {
 app.put('/api/tasks/:id', (req, res) => {
   const index = tasks.findIndex(t => t.id === req.params.id);
   if (index !== -1) {
-    tasks[index] = { ...tasks[index], ...req.body };
+    tasks[index] = { ...tasks[index], priority: 'low', ...req.body };
     res.json(tasks[index]);
   } else {
     res.status(404).json({ message: 'Task not found' });
