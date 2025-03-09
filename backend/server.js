@@ -26,6 +26,24 @@ let tasks = [
     completed: false,
     priority: 'high',
   },
+
+  {
+    id: uuidv4(),
+    title: "Im trying",
+    description: "Dew it",
+    dueDate: "2025-12-31",
+    completed: false,
+    priority: 'high',
+  },
+  {
+    id: uuidv4(),
+    title: "Im trying",
+    description: "Dew it",
+    dueDate: "2025-12-31",
+    completed: false,
+    priority: 'high',
+  },
+  
   // Add more tasks as needed
 ];
 

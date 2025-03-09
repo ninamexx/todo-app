@@ -5,18 +5,21 @@ import { TaskForm } from "./TaskForm";
 import { Pagination } from "@/components/Pagination";
 import { Button } from "./ui/button";
 import axios from "axios";
-import { calculateDaysUntilDue } from "@/utils/utils";
 
 export const TaskListClient = () => {
   const [tasks, setTasks] = useState<Todo[]>([]);
   const [isTaskFormVisible, setIsTaskFormVisible] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Todo | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [completedPage, setCompletedPage] = useState(1);
   const tasksPerPage = 5;
   const [sortCriteria, setSortCriteria] = useState<"title" | "dueDate">(
     "title"
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState<"uncompleted" | "completed">(
+    "uncompleted"
+  );
 
   useEffect(() => {
     // Fetch tasks from the API when the component mounts
@@ -24,8 +27,6 @@ export const TaskListClient = () => {
       try {
         const response = await axios.get("http://localhost:5000/api/tasks", {
           params: {
-            page: currentPage,
-            limit: tasksPerPage,
             sort: sortCriteria,
             search: searchQuery,
           },
@@ -37,7 +38,7 @@ export const TaskListClient = () => {
     };
 
     fetchTasks();
-  }, [currentPage, tasksPerPage, sortCriteria, searchQuery]);
+  }, [sortCriteria, searchQuery]);
 
   const addTask = async (newTask: Todo) => {
     try {
@@ -70,7 +71,24 @@ export const TaskListClient = () => {
   const deleteTask = async (id: string) => {
     try {
       await axios.delete(`http://localhost:5000/api/tasks/${id}`);
-      setTasks(tasks.filter((task) => task.id !== id));
+      const updatedTasks = tasks.filter((task) => task.id !== id);
+      setTasks(updatedTasks);
+
+      // Check if the current page is empty and adjust the page number
+      if (activeTab === "uncompleted") {
+        const uncompletedTasks = updatedTasks.filter((task) => !task.completed);
+        const totalPages =
+          Math.ceil(uncompletedTasks.length / tasksPerPage) || 1;
+        if (currentPage > totalPages) {
+          setCurrentPage(totalPages);
+        }
+      } else {
+        const completedTasks = updatedTasks.filter((task) => task.completed);
+        const totalPages = Math.ceil(completedTasks.length / tasksPerPage) || 1;
+        if (completedPage > totalPages) {
+          setCompletedPage(totalPages);
+        }
+      }
     } catch (error) {
       console.error("Error deleting task:", error);
     }
@@ -80,12 +98,39 @@ export const TaskListClient = () => {
     const task = tasks.find((task) => task.id === id);
     if (task) {
       const updatedTask = { ...task, completed: !task.completed };
+      console.log(
+        `Task "${task.title}" marked as ${
+          updatedTask.completed ? "completed" : "uncompleted"
+        }`
+      );
       try {
         const response = await axios.put(
           `http://localhost:5000/api/tasks/${id}`,
           updatedTask
         );
-        setTasks(tasks.map((task) => (task.id === id ? response.data : task)));
+        const updatedTasks = tasks.map((task) =>
+          task.id === id ? response.data : task
+        );
+        setTasks(updatedTasks);
+
+        // Check if the current page is empty and adjust the page number
+        if (activeTab === "uncompleted") {
+          const uncompletedTasks = updatedTasks.filter(
+            (task) => !task.completed
+          );
+          const totalPages =
+            Math.ceil(uncompletedTasks.length / tasksPerPage) || 1;
+          if (currentPage > totalPages) {
+            setCurrentPage(totalPages);
+          }
+        } else {
+          const completedTasks = updatedTasks.filter((task) => task.completed);
+          const totalPages =
+            Math.ceil(completedTasks.length / tasksPerPage) || 1;
+          if (completedPage > totalPages) {
+            setCompletedPage(totalPages);
+          }
+        }
       } catch (error) {
         console.error("Error toggling task completion:", error);
       }
@@ -106,18 +151,30 @@ export const TaskListClient = () => {
     }
   });
 
-  // Pagination logic
-  const indexOfLastTask = currentPage * tasksPerPage;
-  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
-  const currentTasks = sortedTasks.slice(indexOfFirstTask, indexOfLastTask);
+  // Filter tasks based on completion status
+  const uncompletedTasks = sortedTasks.filter((task) => !task.completed);
+  const completedTasks = sortedTasks.filter((task) => task.completed);
 
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+  // Pagination logic for uncompleted tasks
+  const indexOfLastUncompletedTask = currentPage * tasksPerPage;
+  const indexOfFirstUncompletedTask = indexOfLastUncompletedTask - tasksPerPage;
+  const currentUncompletedTasks = uncompletedTasks.slice(
+    indexOfFirstUncompletedTask,
+    indexOfLastUncompletedTask
+  );
 
-  // Format due dates
-  const tasksWithFormattedDueDates = currentTasks.map((task) => ({
-    ...task,
-    formattedDueDate: calculateDaysUntilDue(task.dueDate),
-  }));
+  // Pagination logic for completed tasks
+  const indexOfLastCompletedTask = completedPage * tasksPerPage;
+  const indexOfFirstCompletedTask = indexOfLastCompletedTask - tasksPerPage;
+  const currentCompletedTasks = completedTasks.slice(
+    indexOfFirstCompletedTask,
+    indexOfLastCompletedTask
+  );
+
+  const paginateUncompleted = (pageNumber: number) =>
+    setCurrentPage(pageNumber);
+  const paginateCompleted = (pageNumber: number) =>
+    setCompletedPage(pageNumber);
 
   return (
     <div className="space-y-4 w-4/7 mx-auto">
@@ -154,8 +211,8 @@ export const TaskListClient = () => {
             }
             className="border p-2 rounded"
           >
-            <option value="title">Title</option>
             <option value="dueDate">Due Date</option>
+            <option value="title">Title</option>
           </select>
         </div>
         <div>
@@ -168,17 +225,65 @@ export const TaskListClient = () => {
           />
         </div>
       </div>
-      <TaskList
-        tasks={tasksWithFormattedDueDates}
-        toggleComplete={toggleComplete}
-        onEdit={handleEdit}
-      />
-      <Pagination
-        tasksPerPage={tasksPerPage}
-        totalTasks={tasks.length}
-        paginate={paginate}
-        currentPage={currentPage}
-      />
+      <div className="tabs flex space-x-4">
+        <button
+          className={`tab ${
+            activeTab === "uncompleted" ? "active" : ""
+          } p-2 border-b-2`}
+          onClick={() => setActiveTab("uncompleted")}
+        >
+          Uncompleted Tasks ({uncompletedTasks.length})
+        </button>
+        <button
+          className={`tab ${
+            activeTab === "completed" ? "active" : ""
+          } p-2 border-b-2`}
+          onClick={() => setActiveTab("completed")}
+        >
+          Completed Tasks ({completedTasks.length})
+        </button>
+      </div>
+      {activeTab === "uncompleted" ? (
+        <>
+          {currentUncompletedTasks.length === 0 ? (
+            <p>No uncompleted tasks</p>
+          ) : (
+            <>
+              <TaskList
+                tasks={currentUncompletedTasks}
+                toggleComplete={toggleComplete}
+                onEdit={handleEdit}
+              />
+              <Pagination
+                tasksPerPage={tasksPerPage}
+                totalTasks={uncompletedTasks.length}
+                paginate={paginateUncompleted}
+                currentPage={currentPage}
+              />
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          {currentCompletedTasks.length === 0 ? (
+            <p>No completed tasks... yet</p>
+          ) : (
+            <>
+              <TaskList
+                tasks={currentCompletedTasks}
+                toggleComplete={toggleComplete}
+                onEdit={handleEdit}
+              />
+              <Pagination
+                tasksPerPage={tasksPerPage}
+                totalTasks={completedTasks.length}
+                paginate={paginateCompleted}
+                currentPage={completedPage}
+              />
+            </>
+          )}
+        </>
+      )}
     </div>
   );
 };
