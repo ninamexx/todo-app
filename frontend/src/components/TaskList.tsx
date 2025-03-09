@@ -1,4 +1,4 @@
-import { TaskItem } from "./TaskItem";
+import { TaskItem } from "@/components/TaskItem";
 import { Todo } from "@/../../types";
 
 type TaskListProps = {

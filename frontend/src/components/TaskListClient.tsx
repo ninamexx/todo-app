@@ -1,4 +1,3 @@
-"use client";
 import { Todo } from "@/../../types";
 import { useState, useEffect } from "react";
 import TaskList from "./TaskList";
@@ -6,6 +5,7 @@ import { TaskForm } from "./TaskForm";
 import { Pagination } from "@/components/Pagination";
 import { Button } from "./ui/button";
 import axios from "axios";
+import { calculateDaysUntilDue } from "@/utils/utils";
 
 export const TaskListClient = () => {
   const [tasks, setTasks] = useState<Todo[]>([]);
@@ -113,6 +113,12 @@ export const TaskListClient = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
+  // Format due dates
+  const tasksWithFormattedDueDates = currentTasks.map((task) => ({
+    ...task,
+    formattedDueDate: calculateDaysUntilDue(task.dueDate),
+  }));
+
   return (
     <div className="space-y-4 w-4/7 mx-auto">
       <Button
@@ -163,7 +169,7 @@ export const TaskListClient = () => {
         </div>
       </div>
       <TaskList
-        tasks={currentTasks}
+        tasks={tasksWithFormattedDueDates}
         toggleComplete={toggleComplete}
         onEdit={handleEdit}
       />
