@@ -28,7 +28,7 @@ export const TaskForm = ({
     task?.description || ""
   );
   const [taskDueDate, setTaskDueDate] = useState(task?.dueDate || "");
-  const [taskPriority, setTaskPriority] = useState(task?.priority || "low");
+  const [taskPriority, setTaskPriority] = useState(task?.priority || "Low");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [dueDateWarning, setDueDateWarning] = useState("");
 
@@ -95,14 +95,14 @@ export const TaskForm = ({
       title: taskName.trim(),
       description: taskDescription.trim(),
       dueDate: taskDueDate.trim(),
-      priority: taskPriority,
+      priority: taskPriority as "Low" | "Medium" | "High",
       completed: task?.completed || false,
     };
     onAddTask(newTask);
     setTaskName("");
     setTaskDescription("");
     setTaskDueDate("");
-    setTaskPriority("low");
+    setTaskPriority("Low");
     onClose();
   };
 
@@ -146,13 +146,17 @@ export const TaskForm = ({
         ) : (
           errors.dueDate && <p className="text-red-500">{errors.dueDate}</p>
         )}
-        <input
-          type="text"
+        <select
           value={taskPriority}
-          onChange={(e) => setTaskPriority(e.target.value)}
-          placeholder="Enter task priority..."
+          onChange={(e) =>
+            setTaskPriority(e.target.value as "Low" | "Medium" | "High")
+          }
           className="border p-2 rounded w-full mb-1"
-        />
+        >
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
         <div className="flex justify-between items-center">
           {task && (
             <Button
