@@ -47,6 +47,7 @@ export const TaskListClient = () => {
         newTask
       );
       setTasks([...tasks, response.data]);
+      console.log(`Task "${newTask.title}" added successfully`);
     } catch (error) {
       console.error("Error adding task:", error);
     }
@@ -63,6 +64,7 @@ export const TaskListClient = () => {
       );
       setTaskToEdit(null);
       setIsTaskFormVisible(false);
+      console.log(`Task "${updatedTask.title}" edited successfully`);
     } catch (error) {
       console.error("Error editing task:", error);
     }
@@ -91,6 +93,24 @@ export const TaskListClient = () => {
       }
     } catch (error) {
       console.error("Error deleting task:", error);
+    }
+  };
+
+  const handleDeleteAllTasks = async () => {
+    try {
+      // Fetch all tasks from the backend
+      const response = await axios.get("http://localhost:5000/api/tasks");
+      const allTasks: Todo[] = response.data.tasks;
+
+      // Delete all tasks from the backend
+      for (const task of allTasks) {
+        await axios.delete(`http://localhost:5000/api/tasks/${task.id}`);
+      }
+
+      // Clear existing tasks from the frontend state
+      setTasks([]);
+    } catch (error) {
+      console.error("Error deleting all tasks:", error);
     }
   };
 
@@ -140,6 +160,7 @@ export const TaskListClient = () => {
   const handleEdit = (task: Todo) => {
     setTaskToEdit(task);
     setIsTaskFormVisible(true);
+    console.log(`Editing task "${task.title}"`);
   };
 
   // Sorting logic
@@ -186,6 +207,12 @@ export const TaskListClient = () => {
         className=""
       >
         + New Task
+      </Button>
+      <Button
+        onClick={handleDeleteAllTasks}
+        className="bg-red-500 hover:bg-red-800"
+      >
+        Delete All Tasks
       </Button>
       {isTaskFormVisible && (
         <TaskForm
