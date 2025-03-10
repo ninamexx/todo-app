@@ -72,81 +72,95 @@ export const TaskListClient = () => {
 
   return (
     <div className="space-y-4 w-4/7 mx-auto">
-      <Button
-        onClick={() => {
-          setIsTaskFormVisible(true);
-          setTaskToEdit(null);
-        }}
-        className=""
-      >
-        + New Task
-      </Button>
-      <Button onClick={handleAddPredefinedTasks} className="">
-        + Add Predefined Tasks
-      </Button>
-      <Button onClick={handleDeleteAllTasks} className="">
-        Delete All Tasks
-      </Button>
-      {isTaskFormVisible && (
-        <TaskForm
-          onAddTask={taskToEdit ? handleEditTask : handleAddTask}
-          onClose={() => {
-            setIsTaskFormVisible(false);
+      <div className="flex justify-between items-center mx-auto w-1/2">
+        <Button
+          onClick={() => {
+            setIsTaskFormVisible(true);
             setTaskToEdit(null);
           }}
-          task={taskToEdit}
-          onDelete={handleDeleteTask}
-        />
-      )}
-      <div className="flex justify-between items-center">
-        <div>
-          <label htmlFor="sort" className="mr-2">
-            Sort by:
-          </label>
-          <select
-            id="sort"
-            value={sortCriteria}
-            onChange={(e) =>
-              setSortCriteria(e.target.value as "title" | "dueDate")
-            }
-            className="border p-2 rounded"
-          >
-            <option value="dueDate">Due Date</option>
-            <option value="title">Title</option>
-          </select>
-        </div>
-        <div>
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="border p-2 rounded"
+          className=""
+        >
+          + New Task
+        </Button>
+        <Button onClick={handleAddPredefinedTasks} className="">
+          + Add Predefined Tasks
+        </Button>
+        <Button
+          onClick={handleDeleteAllTasks}
+          className="bg-red-500 hover:bg-red-800"
+        >
+          Delete All Tasks
+        </Button>
+        {isTaskFormVisible && (
+          <TaskForm
+            onAddTask={taskToEdit ? handleEditTask : handleAddTask}
+            onClose={() => {
+              setIsTaskFormVisible(false);
+              setTaskToEdit(null);
+            }}
+            task={taskToEdit}
+            onDelete={handleDeleteTask}
           />
-        </div>
+        )}
       </div>
-      <div className="tabs flex space-x-4">
-        <button
-          className={`tab ${
-            activeTab === "uncompleted" ? "active" : ""
-          } p-2 border-b-2`}
-          onClick={() => setActiveTab("uncompleted")}
-        >
-          Uncompleted Tasks ({uncompletedTasks.length})
-        </button>
-        <button
-          className={`tab ${
-            activeTab === "completed" ? "active" : ""
-          } p-2 border-b-2`}
-          onClick={() => setActiveTab("completed")}
-        >
-          Completed Tasks ({completedTasks.length})
-        </button>
+
+      <div className="flex justify-between items-center">
+        <div className="tabs flex space-x-4">
+          <Button
+            className={`tab ${
+              activeTab === "uncompleted"
+                ? "bg-gray-500 text-white"
+                : "bg-white text-black hover:bg-gray-200"
+            } p-2 border-b-2 w-32`}
+            onClick={() => setActiveTab("uncompleted")}
+          >
+            To do ({uncompletedTasks.length})
+          </Button>
+          <Button
+            className={`tab ${
+              activeTab === "completed"
+                ? "bg-gray-500 text-white"
+                : "bg-white text-black hover:bg-gray-200"
+            } p-2 border-b-2 w-32`}
+            onClick={() => setActiveTab("completed")}
+          >
+            Completed ({completedTasks.length})
+          </Button>
+        </div>
+        <div className="flex items-center space-x-4">
+          <div>
+            <label htmlFor="sort" className="mr-2">
+              Sort by:
+            </label>
+            <select
+              id="sort"
+              value={sortCriteria}
+              onChange={(e) =>
+                setSortCriteria(e.target.value as "title" | "dueDate")
+              }
+              className="border p-2 rounded"
+            >
+              <option value="dueDate">Due Date</option>
+              <option value="title">Title</option>
+            </select>
+          </div>
+          <div>
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="border p-2 rounded"
+            />
+          </div>
+        </div>
       </div>
       {activeTab === "uncompleted" ? (
         <>
           {currentUncompletedTasks.length === 0 ? (
-            <p>No uncompleted tasks, create one!</p>
+            <div className="flex justify-center items-center h-64">
+              <p>No uncompleted tasks, create one!</p>
+            </div>
           ) : (
             <>
               <TaskList
@@ -166,7 +180,9 @@ export const TaskListClient = () => {
       ) : (
         <>
           {currentCompletedTasks.length === 0 ? (
-            <p>No completed tasks... yet</p>
+            <div className="flex justify-center items-center h-64">
+              <p>No completed tasks... yet</p>
+            </div>
           ) : (
             <>
               <TaskList
