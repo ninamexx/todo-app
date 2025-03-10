@@ -301,7 +301,9 @@ export const TaskListClient = () => {
       {activeTab === "uncompleted" ? (
         <>
           {currentUncompletedTasks.length === 0 ? (
-            <p>No uncompleted tasks</p>
+            <div className="flex justify-center items-center h-64">
+              <p>No uncompleted tasks, add a new one!</p>
+            </div>
           ) : (
             <>
               <TaskList
@@ -321,7 +323,9 @@ export const TaskListClient = () => {
       ) : (
         <>
           {currentCompletedTasks.length === 0 ? (
-            <p>No completed tasks... yet</p>
+            <div className="flex justify-center items-center h-64">
+              <p>No completed tasks... yet</p>
+            </div>
           ) : (
             <>
               <TaskList
