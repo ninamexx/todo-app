@@ -8,8 +8,6 @@ import { useTasks } from "../hooks/useTasks";
 import { addPredefinedTasks } from "../predefinedTasks";
 
 export const TaskListClient = () => {
-  const [isTaskFormVisible, setIsTaskFormVisible] = useState(false);
-  const [taskToEdit, setTaskToEdit] = useState<Todo | null>(null);
   const [sortCriteria, setSortCriteria] = useState<"title" | "dueDate">(
     "dueDate"
   );
@@ -17,6 +15,7 @@ export const TaskListClient = () => {
 
   const {
     tasks,
+    setTasks,
     currentPage,
     setCurrentPage,
     completedPage,
@@ -29,11 +28,15 @@ export const TaskListClient = () => {
     handleDeleteTask,
     handleDeleteAllTasks,
     toggleComplete,
+    taskToEdit,
+    isTaskFormVisible,
+    setIsTaskFormVisible,
+    handleEdit,
   } = useTasks(sortCriteria, searchQuery);
 
   const handleAddPredefinedTasks = async () => {
     await handleDeleteAllTasks();
-    await addPredefinedTasks(() => tasks, handleAddTask);
+    await addPredefinedTasks(setTasks, handleAddTask);
   };
 
   // Sorting logic
@@ -166,7 +169,7 @@ export const TaskListClient = () => {
               <TaskList
                 tasks={currentUncompletedTasks}
                 toggleComplete={toggleComplete}
-                onEdit={setTaskToEdit}
+                onEdit={handleEdit} // Use handleEdit from useTasks
               />
               <Pagination
                 tasksPerPage={tasksPerPage}
@@ -188,7 +191,7 @@ export const TaskListClient = () => {
               <TaskList
                 tasks={currentCompletedTasks}
                 toggleComplete={toggleComplete}
-                onEdit={setTaskToEdit}
+                onEdit={handleEdit} // Use handleEdit from useTasks
               />
               <Pagination
                 tasksPerPage={tasksPerPage}

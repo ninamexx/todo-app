@@ -8,6 +8,8 @@ export const useTasks = (sortCriteria: string, searchQuery: string) => {
   const [completedPage, setCompletedPage] = useState(1);
   const tasksPerPage = 5;
   const [activeTab, setActiveTab] = useState<"uncompleted" | "completed">("uncompleted");
+  const [taskToEdit, setTaskToEdit] = useState<Todo | null>(null);
+  const [isTaskFormVisible, setIsTaskFormVisible] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,6 +27,8 @@ export const useTasks = (sortCriteria: string, searchQuery: string) => {
   const handleEditTask = async (updatedTask: Todo) => {
     const editedTask = await editTask(updatedTask);
     setTasks((prevTasks) => prevTasks.map((task) => (task.id === updatedTask.id ? editedTask : task)));
+    setTaskToEdit(null);
+    setIsTaskFormVisible(false);
   };
 
   const handleDeleteTask = async (id: string) => {
@@ -46,8 +50,14 @@ export const useTasks = (sortCriteria: string, searchQuery: string) => {
     }
   };
 
+  const handleEdit = (task: Todo) => {
+    setTaskToEdit(task);
+    setIsTaskFormVisible(true);
+  };
+
   return {
     tasks,
+    setTasks,
     currentPage,
     setCurrentPage,
     completedPage,
@@ -60,5 +70,9 @@ export const useTasks = (sortCriteria: string, searchQuery: string) => {
     handleDeleteTask,
     handleDeleteAllTasks,
     toggleComplete,
+    taskToEdit,
+    isTaskFormVisible,
+    setIsTaskFormVisible,
+    handleEdit,
   };
 };
