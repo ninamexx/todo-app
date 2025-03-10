@@ -1,10 +1,11 @@
 import { Todo } from "@/../../types";
 import { useState, useEffect } from "react";
-import TaskList from "./TaskList";
-import { TaskForm } from "./TaskForm";
+import TaskList from "@/components/TaskList";
+import { TaskForm } from "@/components/TaskForm";
 import { Pagination } from "@/components/Pagination";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import axios from "axios";
+import { predefinedTasks } from "@/predefinedTasks";
 
 export const TaskListClient = () => {
   const [tasks, setTasks] = useState<Todo[]>([]);
@@ -13,8 +14,8 @@ export const TaskListClient = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [completedPage, setCompletedPage] = useState(1);
   const tasksPerPage = 5;
-  const [sortCriteria, setSortCriteria] = useState<"title" | "dueDate">(
-    "title"
+  const [sortCriteria, setSortCriteria] = useState<"dueDate" | "title">(
+    "dueDate"
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"uncompleted" | "completed">(
@@ -279,7 +280,7 @@ export const TaskListClient = () => {
               id="sort"
               value={sortCriteria}
               onChange={(e) =>
-                setSortCriteria(e.target.value as "title" | "dueDate")
+                setSortCriteria(e.target.value as "dueDate" | "title")
               }
               className="border p-2 rounded"
             >
