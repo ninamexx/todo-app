@@ -1,162 +1,39 @@
 import { Todo } from "@/../../types";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import TaskList from "./TaskList";
 import { TaskForm } from "./TaskForm";
 import { Pagination } from "@/components/Pagination";
 import { Button } from "./ui/button";
-import axios from "axios";
+import { useTasks } from "../hooks/useTasks";
 import { addPredefinedTasks } from "../predefinedTasks";
 
 export const TaskListClient = () => {
-  const [tasks, setTasks] = useState<Todo[]>([]);
   const [isTaskFormVisible, setIsTaskFormVisible] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Todo | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [completedPage, setCompletedPage] = useState(1);
-  const tasksPerPage = 5;
   const [sortCriteria, setSortCriteria] = useState<"title" | "dueDate">(
-    "title"
+    "dueDate"
   );
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<"uncompleted" | "completed">(
-    "uncompleted"
-  );
 
-  useEffect(() => {
-    // Fetch tasks from the API when the component mounts
-    const fetchTasks = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/tasks", {
-          params: {
-            sort: sortCriteria,
-            search: searchQuery,
-          },
-        });
-        setTasks(response.data.tasks);
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      }
-    };
+  const {
+    tasks,
+    currentPage,
+    setCurrentPage,
+    completedPage,
+    setCompletedPage,
+    tasksPerPage,
+    activeTab,
+    setActiveTab,
+    handleAddTask,
+    handleEditTask,
+    handleDeleteTask,
+    handleDeleteAllTasks,
+    toggleComplete,
+  } = useTasks(sortCriteria, searchQuery);
 
-    fetchTasks();
-  }, [sortCriteria, searchQuery]);
-
-  const addTask = async (newTask: Todo) => {
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/api/tasks",
-        newTask
-      );
-      setTasks((prevTasks) => [...prevTasks, response.data]);
-    } catch (error) {
-      console.error("Error adding task:", error);
-    }
-  };
-
-  const editTask = async (updatedTask: Todo) => {
-    try {
-      const response = await axios.put(
-        `http://localhost:5000/api/tasks/${updatedTask.id}`,
-        updatedTask
-      );
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === updatedTask.id ? response.data : task
-        )
-      );
-      setTaskToEdit(null);
-      setIsTaskFormVisible(false);
-    } catch (error) {
-      console.error("Error editing task:", error);
-    }
-  };
-
-  const deleteTask = async (id: string) => {
-    try {
-      await axios.delete(`http://localhost:5000/api/tasks/${id}`);
-      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
-
-      // Check if the current page is empty and adjust the page number
-      if (activeTab === "uncompleted") {
-        const uncompletedTasks = tasks.filter((task) => !task.completed);
-        const totalPages =
-          Math.ceil(uncompletedTasks.length / tasksPerPage) || 1;
-        if (currentPage > totalPages) {
-          setCurrentPage(totalPages);
-        }
-      } else {
-        const completedTasks = tasks.filter((task) => task.completed);
-        const totalPages = Math.ceil(completedTasks.length / tasksPerPage) || 1;
-        if (completedPage > totalPages) {
-          setCompletedPage(totalPages);
-        }
-      }
-    } catch (error) {
-      console.error("Error deleting task:", error);
-    }
-  };
-
-  const toggleComplete = async (id: string) => {
-    const task = tasks.find((task) => task.id === id);
-    if (task) {
-      const updatedTask = { ...task, completed: !task.completed };
-      console.log(
-        `Task "${task.title}" marked as ${
-          updatedTask.completed ? "completed" : "uncompleted"
-        }`
-      );
-      try {
-        const response = await axios.put(
-          `http://localhost:5000/api/tasks/${id}`,
-          updatedTask
-        );
-        setTasks((prevTasks) =>
-          prevTasks.map((task) => (task.id === id ? response.data : task))
-        );
-
-        // Check if the current page is empty and adjust the page number
-        if (activeTab === "uncompleted") {
-          const uncompletedTasks = tasks.filter((task) => !task.completed);
-          const totalPages =
-            Math.ceil(uncompletedTasks.length / tasksPerPage) || 1;
-          if (currentPage > totalPages) {
-            setCurrentPage(totalPages);
-          }
-        } else {
-          const completedTasks = tasks.filter((task) => task.completed);
-          const totalPages =
-            Math.ceil(completedTasks.length / tasksPerPage) || 1;
-          if (completedPage > totalPages) {
-            setCompletedPage(totalPages);
-          }
-        }
-      } catch (error) {
-        console.error("Error toggling task completion:", error);
-      }
-    }
-  };
-
-  const handleEdit = (task: Todo) => {
-    setTaskToEdit(task);
-    setIsTaskFormVisible(true);
-  };
-
-  const deleteAllTasks = async () => {
-    try {
-      // Fetch all tasks from the backend
-      const response = await axios.get("http://localhost:5000/api/tasks");
-      const allTasks: Todo[] = response.data.tasks;
-
-      // Delete all tasks from the backend
-      for (const task of allTasks) {
-        await axios.delete(`http://localhost:5000/api/tasks/${task.id}`);
-      }
-
-      // Clear existing tasks from the frontend state
-      setTasks([]);
-    } catch (error) {
-      console.error("Error deleting all tasks:", error);
-    }
+  const handleAddPredefinedTasks = async () => {
+    await handleDeleteAllTasks();
+    await addPredefinedTasks(() => tasks, handleAddTask);
   };
 
   // Sorting logic
@@ -193,11 +70,6 @@ export const TaskListClient = () => {
   const paginateCompleted = (pageNumber: number) =>
     setCompletedPage(pageNumber);
 
-  const handleAddPredefinedTasks = async () => {
-    await deleteAllTasks();
-    await addPredefinedTasks(setTasks, addTask);
-  };
-
   return (
     <div className="space-y-4 w-4/7 mx-auto">
       <Button
@@ -212,18 +84,18 @@ export const TaskListClient = () => {
       <Button onClick={handleAddPredefinedTasks} className="">
         + Add Predefined Tasks
       </Button>
-      <Button onClick={deleteAllTasks} className="">
+      <Button onClick={handleDeleteAllTasks} className="">
         Delete All Tasks
       </Button>
       {isTaskFormVisible && (
         <TaskForm
-          onAddTask={taskToEdit ? editTask : addTask}
+          onAddTask={taskToEdit ? handleEditTask : handleAddTask}
           onClose={() => {
             setIsTaskFormVisible(false);
             setTaskToEdit(null);
           }}
           task={taskToEdit}
-          onDelete={deleteTask}
+          onDelete={handleDeleteTask}
         />
       )}
       <div className="flex justify-between items-center">
@@ -235,12 +107,12 @@ export const TaskListClient = () => {
             id="sort"
             value={sortCriteria}
             onChange={(e) =>
-              setSortCriteria(e.target.value as "dueDate" | "title")
+              setSortCriteria(e.target.value as "title" | "dueDate")
             }
             className="border p-2 rounded"
           >
-            <option value="title">Due Ddate</option>
-            <option value="dueDate">Title</option>
+            <option value="dueDate">Due Date</option>
+            <option value="title">Title</option>
           </select>
         </div>
         <div>
@@ -274,13 +146,13 @@ export const TaskListClient = () => {
       {activeTab === "uncompleted" ? (
         <>
           {currentUncompletedTasks.length === 0 ? (
-            <p>No uncompleted tasks, yippie!</p>
+            <p>No uncompleted tasks, create one!</p>
           ) : (
             <>
               <TaskList
                 tasks={currentUncompletedTasks}
                 toggleComplete={toggleComplete}
-                onEdit={handleEdit}
+                onEdit={setTaskToEdit}
               />
               <Pagination
                 tasksPerPage={tasksPerPage}
@@ -300,7 +172,7 @@ export const TaskListClient = () => {
               <TaskList
                 tasks={currentCompletedTasks}
                 toggleComplete={toggleComplete}
-                onEdit={handleEdit}
+                onEdit={setTaskToEdit}
               />
               <Pagination
                 tasksPerPage={tasksPerPage}

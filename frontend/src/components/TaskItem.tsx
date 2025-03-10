@@ -18,7 +18,8 @@ export const TaskItem = ({ task, toggleComplete, onEdit }: TaskItemProps) => {
         onClick={() => toggleComplete(task.id)}
       >
         {task.title && <h2 className="text-lg">{task.title}</h2>}
-        {task.description && <p className="text-sm">{task.description}</p>}
+        {task.description && <p className="text-sm">{task.description} </p>}
+        {task.priority && <p className="text-sm">{task.priority} priority</p>}
         {task.dueDate && (
           <p className="text-sm">Due {calculateDaysUntilDue(task.dueDate)}</p>
         )}
