@@ -167,10 +167,17 @@ export const TaskListClient = () => {
   const addPredefinedTasks = async () => {
     try {
       for (const task of predefinedTasks) {
+        console.log(`Adding task: ${task.title}`);
         await axios.post("http://localhost:5000/api/tasks", task);
       }
       // Fetch the updated list of tasks from the server
-      const response = await axios.get("http://localhost:5000/api/tasks");
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      const response = await axios.get("http://localhost:5000/api/tasks", {
+        params: {
+          sort: sortCriteria,
+          search: searchQuery,
+        },
+      });
       setTasks(response.data.tasks);
       console.log("Predefined tasks added successfully");
     } catch (error) {
