@@ -4,5 +4,5 @@ export interface Todo {
     description: string;
     dueDate: string; //YYYY-MM-DD
     completed: boolean;
-    priority: 'low' | 'medium' | 'high';
+    priority: 'Low' | 'Medium' | 'High';
 }

@@ -9,25 +9,7 @@ const port = 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
-let tasks = [
-  {
-    id: uuidv4(),
-    title: "Learn React",
-    description: "Learn it",
-    dueDate: "2025-12-31",
-    completed: false,
-    priority: 'medium',
-  },
-  {
-    id: uuidv4(),
-    title: "Build To-Do App",
-    description: "Dew it",
-    dueDate: "2025-12-31",
-    completed: false,
-    priority: 'high',
-  },
-  // Add more tasks as needed
-];
+let tasks = [];
 
 // Get all tasks with pagination, sorting, and searching
 app.get('/api/tasks', (req, res) => {

@@ -1,4 +1,4 @@
-import { TaskItem } from "./TaskItem";
+import { TaskItem } from "@/components/TaskItem";
 import { Todo } from "@/../../types";
 
 type TaskListProps = {
@@ -13,7 +13,7 @@ export default function TaskList({
   onEdit,
 }: TaskListProps) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-2  w-full">
       {tasks.map((task) => (
         <TaskItem
           key={task.id}

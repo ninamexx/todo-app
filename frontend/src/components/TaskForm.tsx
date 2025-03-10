@@ -28,7 +28,7 @@ export const TaskForm = ({
     task?.description || ""
   );
   const [taskDueDate, setTaskDueDate] = useState(task?.dueDate || "");
-  const [taskPriority, setTaskPriority] = useState(task?.priority || "low");
+  const [taskPriority, setTaskPriority] = useState(task?.priority || "Low");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [dueDateWarning, setDueDateWarning] = useState("");
 
@@ -95,14 +95,14 @@ export const TaskForm = ({
       title: taskName.trim(),
       description: taskDescription.trim(),
       dueDate: taskDueDate.trim(),
-      priority: taskPriority,
+      priority: taskPriority as "Low" | "Medium" | "High",
       completed: task?.completed || false,
     };
     onAddTask(newTask);
     setTaskName("");
     setTaskDescription("");
     setTaskDueDate("");
-    setTaskPriority("low");
+    setTaskPriority("Low");
     onClose();
   };
 
@@ -115,45 +115,54 @@ export const TaskForm = ({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-800/50">
-      <div className="bg-white p-6 rounded shadow-lg w-full max-w-md sm:w-3/4">
+      <div className="bg-white p-6 rounded shadow-lg w-full max-w-md sm:w-3/4 h-[530px] overflow-y-auto">
         <h2 className="text-2xl mb-4">{task ? "Edit Task" : "Add New Task"}</h2>
         <input
           type="text"
           value={taskName}
           onChange={(e) => setTaskName(e.target.value)}
           placeholder="Enter task title..."
-          className="border p-2 rounded w-full mb-1"
+          className="border p-2 rounded w-full"
         />
-        {errors.title && <p className="text-red-500 mb-3">{errors.title}</p>}
-        <input
-          type="text"
+        <div className="h-6 mb-3">
+          {errors.title && <p className="text-red-500">{errors.title}</p>}
+        </div>
+        <textarea
           value={taskDescription}
           onChange={(e) => setTaskDescription(e.target.value)}
           placeholder="Enter task description..."
-          className="border p-2 rounded w-full mb-1"
+          className="border p-2 rounded w-full h-32"
         />
-        {errors.description && (
-          <p className="text-red-500 mb-3">{errors.description}</p>
-        )}
+        <div className="h-6 mb-3">
+          {errors.description && (
+            <p className="text-red-500">{errors.description}</p>
+          )}
+        </div>
         <input
           type="date"
           value={taskDueDate}
           onChange={handleDueDateChange}
-          className="border p-2 rounded w-full mb-1"
+          className="border p-2 rounded w-full"
         />
-        {dueDateWarning ? (
-          <p className="text-yellow-500">{dueDateWarning}</p>
-        ) : (
-          errors.dueDate && <p className="text-red-500">{errors.dueDate}</p>
-        )}
-        <input
-          type="text"
+        <div className="h-6 mb-3">
+          {dueDateWarning ? (
+            <p className="text-yellow-500">{dueDateWarning}</p>
+          ) : (
+            errors.dueDate && <p className="text-red-500">{errors.dueDate}</p>
+          )}
+        </div>
+        <select
           value={taskPriority}
-          onChange={(e) => setTaskPriority(e.target.value)}
-          placeholder="Enter task priority..."
-          className="border p-2 rounded w-full mb-1"
-        />
-        <div className="flex justify-between items-center">
+          onChange={(e) =>
+            setTaskPriority(e.target.value as "Low" | "Medium" | "High")
+          }
+          className="border p-2 rounded w-full mb-3"
+        >
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+        <div className="flex justify-between items-center mt-3">
           {task && (
             <Button
               onClick={handleDelete}
